@@ -16,24 +16,33 @@ def hex_to_bgr(hex_color):
 def create_text_board(text, color):
     width, height = 100, 100
     duration = 3  
-    fps = 20 
+    fps = 20
     font = cv2.FONT_HERSHEY_COMPLEX
     font_scale = 1
     thickness = 2
+    
+    text_speed = 10
 
     output_file = os.path.join(settings.MEDIA_ROOT, 'output.mp4')
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter('output.mp4', fourcc, fps, (width, height))
 
     text_size = cv2.getTextSize(text, font, font_scale, thickness)
+    
     text_width = (text_size[0])[0]
 
     text_position = width
+    
+    if duration * fps * text_speed < text_width:
+        text_speed = round(text_width/ (duration * fps)) + 2
+    
+    print(text_speed)
+        
 
     for i in range(duration * fps):
         frame = np.zeros((height, width, 3), dtype=np.uint8)
         cv2.putText(frame, text, (text_position, 50), font, font_scale, color, thickness)  
-        text_position -= 10
+        text_position -= text_speed
     
         if text_position < -text_width - 3:
             text_position = width
